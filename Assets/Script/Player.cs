@@ -1,13 +1,17 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
+    [SerializeField]
     public float moveSpeed = 5f;     // ความเร็วในการวิ่งไปทางขวา
 
+    [SerializeField]
     public float flyForce = 7f;      // แรงดันเจ็ทแพ็ทดันตัวขึ้น
-    public bool isContinuousFly = false; // ติ๊กถูกถ้าอยากได้แบบ "กดค้างแล้วบินขึ้นเรื่อยๆ"
+
+    public bool autoRunRight = true;
 
     private Rigidbody rb;
 
@@ -19,23 +23,21 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        if (!isContinuousFly && Input.GetKeyDown(KeyCode.Space))
+
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-            rb.AddForce(Vector3.up * flyForce, ForceMode.Impulse);
+            // เซ็ตความเร็วใหม่: ให้กระโดดขึ้น (flyForce) พร้อมกับพุ่งไปทางขวา (moveSpeed) ทันที
+            rb.linearVelocity = new Vector3(moveSpeed, flyForce, 0f);
         }
     }
 
-    void ForceMove()
+    void FixedUpdate()
     {
-       
         rb.linearVelocity = new Vector3(moveSpeed, rb.linearVelocity.y, 0f);
 
-        if (isContinuousFly && Input.GetKey(KeyCode.Space))
+        if (autoRunRight)
         {
-            rb.AddForce(Vector3.up * flyForce, ForceMode.Acceleration);
+            rb.linearVelocity = new Vector3(moveSpeed, rb.linearVelocity.y, 0f);
         }
     }
 }
