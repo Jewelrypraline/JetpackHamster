@@ -30,39 +30,33 @@ public class PlayerStatus : MonoBehaviour
     public PeeStat pee = new PeeStat();
 
     [Header("Smooth UI")]
-    public float smoothSpeed = 5f;
+    public float smoothSpeed = 8f; // ปรับให้ไวขึ้นนิดนึงตอนระบายฉี่จะได้ตอบสนองทันใจ
 
     void Start()
     {
-        // บังคับเซ็ตค่าเริ่มต้นให้ตรงเป๊ะตั้งแต่เฟรมแรก ไม่ต้องรอเกลี่ย Lerp
         if (hunger.fillImage != null)
-        {
             hunger.fillImage.fillAmount = hunger.currentHunger / hunger.maxHunger;
-        }
 
         if (pee.fillImage != null)
-        {
-            pee.fillImage.fillAmount = pee.currentPee / pee.maxPee; // ปวดฉี่เริ่ม 0 หลอดจะเป็น 0 ทันที
-        }
+            pee.fillImage.fillAmount = pee.currentPee / pee.maxPee;
     }
 
     void Update()
     {
-        // 1. ความหิวลดลง (100 -> 0)
+        // 1. ความหิวลดลงเรื่อยๆ
         if (hunger.currentHunger > 0)
         {
             hunger.currentHunger -= hunger.decreaseRate * Time.deltaTime;
             hunger.currentHunger = Mathf.Clamp(hunger.currentHunger, 0, hunger.maxHunger);
         }
 
-        // 2. ปวดฉี่สะสมเพิ่มขึ้น (0 -> 100)
+        // 2. ปวดฉี่สะสมเพิ่มขึ้นเรื่อยๆ
         if (pee.currentPee < pee.maxPee)
         {
             pee.currentPee += pee.increaseRate * Time.deltaTime;
             pee.currentPee = Mathf.Clamp(pee.currentPee, 0, pee.maxPee);
         }
 
-        // 3. ค่อยๆ เกลี่ย UI นุ่มๆ ระหว่างเล่น
         UpdateUISmoothly();
     }
 
@@ -79,6 +73,13 @@ public class PlayerStatus : MonoBehaviour
             float targetFill = pee.currentPee / pee.maxPee;
             pee.fillImage.fillAmount = Mathf.Lerp(pee.fillImage.fillAmount, targetFill, Time.deltaTime * smoothSpeed);
         }
+    }
+
+    // ฟังก์ชันสั่งลดค่าฉี่ (ใช้ตอนยืนบนถาดฉี่)
+    public void EmptyPee(float emptyRate)
+    {
+        pee.currentPee -= emptyRate * Time.deltaTime;
+        pee.currentPee = Mathf.Clamp(pee.currentPee, 0, pee.maxPee);
     }
 
     public void EatItem(float hungerAmount, float peeAmount)
