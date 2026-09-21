@@ -26,18 +26,15 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            // เซ็ตความเร็วใหม่: ให้กระโดดขึ้น (flyForce) พร้อมกับพุ่งไปทางขวา (moveSpeed) ทันที
-            rb.linearVelocity = new Vector3(moveSpeed, flyForce, 0f);
+            rb.linearVelocity = new Vector3(0f, flyForce, moveSpeed);
         }
     }
 
     void FixedUpdate()
     {
-        rb.linearVelocity = new Vector3(moveSpeed, rb.linearVelocity.y, 0f);
-
         if (autoRunRight)
         {
-            rb.linearVelocity = new Vector3(moveSpeed, rb.linearVelocity.y, 0f);
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, moveSpeed);
         }
     }
 }

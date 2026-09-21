@@ -1,20 +1,9 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class NewMonoBehaviourScript : MonoBehaviour
+public class DangerOpject : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        
-        if (collision.gameObject.CompareTag("Danger"))
-        {
-            Debug.Log("Game Over You got catch!");
-
-            
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
 
         void Start()
         {
@@ -25,6 +14,15 @@ public class NewMonoBehaviourScript : MonoBehaviour
         void Update()
         {
 
+        }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+
+        if (collision.gameObject.CompareTag("Danger"))
+        {
+            Debug.Log("Game Over You got catch!");
+            SceneManager.LoadScene("GameOver");
         }
     }
 }
