@@ -15,14 +15,25 @@ public class DangerOpject : MonoBehaviour
         {
 
         }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player") || other.CompareTag("Danger"))
+        {
+            TriggerGameOver();
+        }
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
-
-        if (collision.gameObject.CompareTag("Danger"))
+        if (collision.gameObject.CompareTag("Player") || collision.gameObject.CompareTag("Danger"))
         {
-            Debug.Log("Game Over You got catch!");
-            SceneManager.LoadScene("GameOver");
+            TriggerGameOver();
         }
+    }
+
+    private void TriggerGameOver()
+    {
+        Debug.Log("Game Over You got catch!");
+        SceneManager.LoadScene("GameOver");
     }
 }
