@@ -1,12 +1,13 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Collections;
 
 public class PlayerStatus : MonoBehaviour
 {
-    //คลาสชุดข้อมูลความหิว
+    // คลาสชุดข้อมูลความหิว
     [Serializable]
     public class HungerStat
     {
@@ -16,7 +17,7 @@ public class PlayerStatus : MonoBehaviour
         public Image fillImage;
     }
 
-    //คลาสชุดข้อมูลฉี่/อึ
+    // คลาสชุดข้อมูลฉี่/อึ
     [Serializable]
     public class PeeStat
     {
@@ -34,14 +35,17 @@ public class PlayerStatus : MonoBehaviour
     public float smoothSpeed = 8f;
 
     [Header("Jump / Movement Settings")]
-    public float normalJumpForce = 10f; // แรงกระโดดปกติ
-    public float currentJumpForce;      // แรงกระโดดปัจจุบันที่จะเอาไปใช้กับสคริปต์เดิน/บิน
+    public float normalJumpForce = 10f;
+    public float currentJumpForce;
 
-    private bool isDead = false; // เช็คสถานะการตาย
+    [Header("Scene Settings")]
+    public string gameOverSceneName = "GameOver"; // ชื่อซีน GameOver (ปรับให้ตรงกับชื่อซีนใน Unity ได้)
+
+    private bool isDead = false;
 
     void Start()
     {
-        currentJumpForce = normalJumpForce; //ตั้งค่าเริ่มต้นให้กระโดดได้ปกติ
+        currentJumpForce = normalJumpForce;
 
         if (hunger.fillImage != null)
             hunger.fillImage.fillAmount = hunger.currentHunger / hunger.maxHunger;
@@ -52,7 +56,7 @@ public class PlayerStatus : MonoBehaviour
 
     void Update()
     {
-        if (isDead) return; //ถ้าตายแล้วหยุดรันทุกอย่าง
+        if (isDead) return;
 
         // ความหิวลดลงเรื่อยๆ
         if (hunger.currentHunger > 0)
@@ -62,7 +66,7 @@ public class PlayerStatus : MonoBehaviour
         }
         else if (hunger.currentHunger <= 0)
         {
-            Die(); //ถ้าหิวจนหมดจะตาย
+            Die(); // หิวจนหมด -> ตาย
         }
 
         // ปวดฉี่สะสมเพิ่มขึ้นเรื่อยๆ
@@ -73,7 +77,7 @@ public class PlayerStatus : MonoBehaviour
         }
         else if (pee.currentPee >= pee.maxPee)
         {
-            PeePants(); //ฉี่แตก
+            Die(); // ปวดฉี่จนเต็ม (ฉี่แตก) -> ตายและย้ายไปซีน GameOver
         }
 
         UpdateUISmoothly();
@@ -94,29 +98,13 @@ public class PlayerStatus : MonoBehaviour
         }
     }
 
-    void PeePants()
-    {
-        hunger.currentHunger -= (hunger.maxHunger * 0.3f);
-        hunger.currentHunger = Mathf.Clamp(hunger.currentHunger, 0, hunger.maxHunger);
-
-        pee.currentPee = 0f;
-
-        //เปลี่ยนจาก 1.00f เป็น 0.3f หรือต่ำกว่านี้ครับ เพื่อให้แรงกระโดดเหลือแค่ 30%
-        currentJumpForce = normalJumpForce * 0.3f;
-
-        StartCoroutine(ResetDebuff());
-    }
-
-    //ฟังก์ชันจับเวลา 10 วินาที
-    private IEnumerator ResetDebuff()
-    {
-        yield return new WaitForSeconds(10f); //รอ 10 วินาที
-        currentJumpForce = normalJumpForce; //รีเซ็ตค่ากระโดดกลับเป็นปกติ
-    }
-
     void Die()
     {
+        if (isDead) return;
         isDead = true;
+
+        // สั่งเปลี่ยนฉากไปหน้า GameOver ทันที
+        SceneManager.LoadScene(gameOverSceneName);
     }
 
     // ฟังก์ชันสั่งลดค่าฉี่ (ใช้ตอนยืนบนถาดฉี่)
