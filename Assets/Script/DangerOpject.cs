@@ -33,7 +33,6 @@ public class DangerOpject : MonoBehaviour
 
     private void TriggerGameOver()
     {
-        Debug.Log("Game Over You got catch!");
         SceneManager.LoadScene("GameOver");
     }
 }
