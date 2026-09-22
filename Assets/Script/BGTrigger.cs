@@ -2,23 +2,26 @@ using UnityEngine;
 
 public class BGTrigger : MonoBehaviour
 {
-    [Header("BackgroundManager Code")]
+    [Header("Background Settings")]
     public BackgroundManager bgManager;
+    public Sprite newBgSprite; // รูปภาพใหม่ที่จะเปลี่ยนเมื่อผู้เล่นเดินผ่านจุดนี้
 
-    [Header("ChangeBG")]
-    public Sprite newBackgroundSprite;
-
-    private bool hasTriggered = false; // ป้องกันไม่ให้ทำงานซ้ำ
+    private void Start()
+    {
+        // ค้นหา BackgroundManager อัตโนมัติหากไม่ได้ลากใส่
+        if (bgManager == null)
+        {
+            bgManager = FindFirstObjectByType<BackgroundManager>();
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!hasTriggered && other.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            hasTriggered = true; // ล็อคไว้ทำงานรอบเดียว
-
-            if (bgManager != null && newBackgroundSprite != null)
+            if (bgManager != null && newBgSprite != null)
             {
-                bgManager.ChangeBackground(newBackgroundSprite);
+                bgManager.ChangeBackground(newBgSprite);
             }
         }
     }

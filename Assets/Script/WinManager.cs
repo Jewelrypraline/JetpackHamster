@@ -4,48 +4,19 @@ using UnityEngine.SceneManagement;
 
 public class WinManager : MonoBehaviour
 {
-    [Header("UI Settings")]
-    public GameObject winPanel;
-
-    private bool isWon = false;
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void OnTriggerEnter(Collider other)
     {
-        if (winPanel != null)
+        // ถ้าเอาสคริปต์นี้แปะไว้ที่เสาเหลือง แล้วผู้เล่นเดินมาชน
+        if (other.CompareTag("Player") || other.CompareTag("WinTrigger"))
         {
-            winPanel.SetActive(false);
+            TriggerWin();
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    // เปิดเป็น public เพื่อให้สคริปต์อื่น (เช่น WinTrigger) เรียกสั่งงานได้ด้วย
+    public void TriggerWin()
     {
-        
-    }
-        public void TriggerWin()
-    {
-        if (isWon) return;
-        isWon = true;
-
-        if (winPanel != null)
-        {
-            winPanel.SetActive(true); // แสดงหน้าต่างชนะ
-        }
-
-        Time.timeScale = 0f; // หยุดเวลาและฟิสิกส์ทั้งหมดในเกม
-    }
-    public void RestartGame()
-    {
-        Time.timeScale = 1f; // คืนค่าเวลาเกมให้วิ่งปกติ
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // โหลดซีนปัจจุบันใหม่
-    }
-
-    // ฟังก์ชันสำหรับปุ่ม Main Menu
-    public void GoToMainMenu()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu"); // เปลี่ยนชื่อซีนให้ตรงกับหน้าเมนูของคุณ
+        Time.timeScale = 1f; // คืนค่าเวลาให้เกมวิ่งปกติ
+        SceneManager.LoadScene("WinScene"); // เปลี่ยนไปหน้า winscene
     }
 }

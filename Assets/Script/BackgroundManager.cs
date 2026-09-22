@@ -5,8 +5,11 @@ using System.Collections;
 public class BackgroundManager : MonoBehaviour
 {
     [Header("UI Image References")]
-    public Image bgCurrent;
-    public Image bgNext;
+    public Image bgCurrent; // ประกาศตัวแปรอ้างอิงรูปปัจจุบัน
+    public Image bgNext;    // ประกาศตัวแปรอ้างอิงรูปถัดไป
+
+    [Header("Default Background Settings")]
+    public Sprite defaultSprite; // ลากรูปใหม่ที่ต้องการใช้เริ่มต้นมาวางช่องนี้
 
     [Header("Transition Settings")]
     public float fadeDuration = 2.0f;
@@ -15,7 +18,16 @@ public class BackgroundManager : MonoBehaviour
 
     void Start()
     {
-        // เริ่มต้นให้ bgNext ซ่อนไว้ก่อน
+        // 1. บังคับเปลี่ยนรูป bgCurrent เป็นรูปใหม่ทันทีเมื่อเริ่มเกม
+        if (defaultSprite != null && bgCurrent != null)
+        {
+            bgCurrent.sprite = defaultSprite;
+            Color c = bgCurrent.color;
+            c.a = 1f;
+            bgCurrent.color = c;
+        }
+
+        // 2. ซ่อน bgNext ไว้ก่อน
         if (bgNext != null)
         {
             Color c = bgNext.color;
@@ -26,7 +38,7 @@ public class BackgroundManager : MonoBehaviour
 
     public void ChangeBackground(Sprite newBgSprite)
     {
-        if (!isTransitioning)
+        if (!isTransitioning && newBgSprite != null)
         {
             StartCoroutine(CrossFadeBackground(newBgSprite));
         }
@@ -36,7 +48,6 @@ public class BackgroundManager : MonoBehaviour
     {
         isTransitioning = true;
 
-        // ใส่รูปใหม่ให้ bgNext และตั้ง Alpha เริ่มต้นเป็น 0
         bgNext.sprite = newBgSprite;
 
         Color currentColor = bgCurrent.color;
@@ -54,7 +65,6 @@ public class BackgroundManager : MonoBehaviour
             timer += Time.deltaTime;
             float progress = Mathf.Clamp01(timer / fadeDuration);
 
-            // ค่อยๆ ลด Alpha ภาพเก่า และเพิ่ม Alpha ภาพใหม่
             currentColor.a = 1f - progress;
             nextColor.a = progress;
 
@@ -64,7 +74,6 @@ public class BackgroundManager : MonoBehaviour
             yield return null;
         }
 
-        // รีเซ็ตค่าเมื่อเฟดเสร็จสิ้น
         bgCurrent.sprite = newBgSprite;
         currentColor.a = 1f;
         bgCurrent.color = currentColor;

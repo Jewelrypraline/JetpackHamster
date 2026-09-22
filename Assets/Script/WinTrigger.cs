@@ -2,7 +2,16 @@ using UnityEngine;
 
 public class WinTrigger : MonoBehaviour
 {
-    public WinManager winManager;
+    public WinManager winManager; // บรรทัดนี้ประกาศไว้ตัวเดียวพอครับ
+
+    void Start()
+    {
+        // ดึง WinManager ในฉากให้อัตโนมัติกันลืมลากใส่
+        if (winManager == null)
+        {
+            winManager = FindFirstObjectByType<WinManager>();
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -10,7 +19,7 @@ public class WinTrigger : MonoBehaviour
         {
             if (winManager != null)
             {
-                winManager.TriggerWin(); // สั่งงานระบบชนะทันทีเมื่อชนเส้นชัย
+                winManager.TriggerWin();
             }
         }
     }
