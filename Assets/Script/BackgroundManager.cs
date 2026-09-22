@@ -9,12 +9,13 @@ public class BackgroundManager : MonoBehaviour
     public Image bgNext;
 
     [Header("Transition Settings")]
-    public float fadeDuration = 2.0f; // ปรับเป็น 2 วินาทีเพื่อให้เห็นการเฟดชัดๆ
+    public float fadeDuration = 2.0f;
 
     private bool isTransitioning = false;
 
     void Start()
     {
+        // เริ่มต้นให้ bgNext ซ่อนไว้ก่อน
         if (bgNext != null)
         {
             Color c = bgNext.color;
@@ -27,40 +28,49 @@ public class BackgroundManager : MonoBehaviour
     {
         if (!isTransitioning)
         {
-            StartCoroutine(FadeToNewBackground(newBgSprite));
+            StartCoroutine(CrossFadeBackground(newBgSprite));
         }
     }
 
-    private IEnumerator FadeToNewBackground(Sprite newBgSprite)
+    private IEnumerator CrossFadeBackground(Sprite newBgSprite)
     {
         isTransitioning = true;
 
-        // 1. ตั้งค่ารูปใหม่ และรีเซ็ต Alpha ของ bgNext ให้เป็น 0 ชัวร์ๆ
+        // ใส่รูปใหม่ให้ bgNext และตั้ง Alpha เริ่มต้นเป็น 0
         bgNext.sprite = newBgSprite;
-        Color startColor = bgNext.color;
-        startColor.a = 0f;
-        bgNext.color = startColor;
 
-        // 2. ค่อยๆ ปรับ Alpha เพิ่มจาก 0 -> 1
+        Color currentColor = bgCurrent.color;
+        Color nextColor = bgNext.color;
+
+        currentColor.a = 1f;
+        nextColor.a = 0f;
+
+        bgCurrent.color = currentColor;
+        bgNext.color = nextColor;
+
         float timer = 0f;
         while (timer < fadeDuration)
         {
             timer += Time.deltaTime;
-            float alpha = Mathf.Clamp01(timer / fadeDuration);
+            float progress = Mathf.Clamp01(timer / fadeDuration);
 
-            Color currentNextColor = bgNext.color;
-            currentNextColor.a = alpha;
-            bgNext.color = currentNextColor;
+            // ค่อยๆ ลด Alpha ภาพเก่า และเพิ่ม Alpha ภาพใหม่
+            currentColor.a = 1f - progress;
+            nextColor.a = progress;
 
-            yield return null; // รอเฟรมถัดไป
+            bgCurrent.color = currentColor;
+            bgNext.color = nextColor;
+
+            yield return null;
         }
 
-        // 3. พอสว่างเต็มที่แล้ว ค่อยย้ายรูปไปไว้ที่ bgCurrent แล้วซ่อน bgNext
+        // รีเซ็ตค่าเมื่อเฟดเสร็จสิ้น
         bgCurrent.sprite = newBgSprite;
+        currentColor.a = 1f;
+        bgCurrent.color = currentColor;
 
-        Color endColor = bgNext.color;
-        endColor.a = 0f;
-        bgNext.color = endColor;
+        nextColor.a = 0f;
+        bgNext.color = nextColor;
 
         isTransitioning = false;
     }
