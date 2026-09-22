@@ -5,17 +5,16 @@ using System.Collections;
 public class BackgroundManager : MonoBehaviour
 {
     [Header("UI Image References")]
-    public Image bgCurrent; // ลาก Bg_Current จาก CanvasBG มาใส่
-    public Image bgNext;    // ลาก Bg_Next จาก CanvasBG มาใส่
+    public Image bgCurrent;
+    public Image bgNext;
 
     [Header("Transition Settings")]
-    public float fadeDuration = 1.5f; // ระยะเวลาเฟด (ยิ่งเยอะยิ่งช้า)
+    public float fadeDuration = 2.0f; // ปรับเป็น 2 วินาทีเพื่อให้เห็นการเฟดชัดๆ
 
     private bool isTransitioning = false;
 
     void Start()
     {
-        // เริ่มต้นเซ็ตให้ bgNext โปร่งใส (Alpha = 0)
         if (bgNext != null)
         {
             Color c = bgNext.color;
@@ -36,29 +35,32 @@ public class BackgroundManager : MonoBehaviour
     {
         isTransitioning = true;
 
-        // 1. ใส่รูปใหม่เข้าที่ bgNext
+        // 1. ตั้งค่ารูปใหม่ และรีเซ็ต Alpha ของ bgNext ให้เป็น 0 ชัวร์ๆ
         bgNext.sprite = newBgSprite;
+        Color startColor = bgNext.color;
+        startColor.a = 0f;
+        bgNext.color = startColor;
 
-        // 2. ค่อยๆ ปรับ Alpha ของ bgNext จาก 0 เป็น 1
+        // 2. ค่อยๆ ปรับ Alpha เพิ่มจาก 0 -> 1
         float timer = 0f;
         while (timer < fadeDuration)
         {
             timer += Time.deltaTime;
             float alpha = Mathf.Clamp01(timer / fadeDuration);
 
-            Color nextColor = bgNext.color;
-            nextColor.a = alpha;
-            bgNext.color = nextColor;
+            Color currentNextColor = bgNext.color;
+            currentNextColor.a = alpha;
+            bgNext.color = currentNextColor;
 
-            yield return null;
+            yield return null; // รอเฟรมถัดไป
         }
 
-        // 3. พอ Fade สว่างเต็มที่ เปลี่ยนรูป bgCurrent เป็นรูปใหม่ แล้วรีเซ็ต bgNext กลับเป็นโปร่งใส
+        // 3. พอสว่างเต็มที่แล้ว ค่อยย้ายรูปไปไว้ที่ bgCurrent แล้วซ่อน bgNext
         bgCurrent.sprite = newBgSprite;
 
-        Color resetNextColor = bgNext.color;
-        resetNextColor.a = 0f;
-        bgNext.color = resetNextColor;
+        Color endColor = bgNext.color;
+        endColor.a = 0f;
+        bgNext.color = endColor;
 
         isTransitioning = false;
     }
